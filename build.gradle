@@ -3,7 +3,9 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
 }
 
 version = mod_version
@@ -18,6 +20,11 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
+
+    mixin {
+        add sourceSets.main, "sophisticatedbackpacksetchedintegration.refmap.json"
+        config "sophisticatedbackpacksetchedintegration.mixins.json"
+    }
 
     copyIdeResources = true
 
