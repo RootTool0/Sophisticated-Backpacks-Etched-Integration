@@ -1,6 +1,6 @@
 package com.absolutebuddies.sophisticatedbackpacksetchedintegration.mixin;
 
-import com.absolutebuddies.sophisticatedbackpacksetchedintegration.EtchedStreamData;
+import com.absolutebuddies.sophisticatedbackpacksetchedintegration.EtchedData;
 import com.absolutebuddies.sophisticatedbackpacksetchedintegration.EtchedStreamInfo;
 import gg.moonflower.etched.common.item.EtchedMusicDiscItem;
 import gg.moonflower.etched.common.network.EtchedMessages;
@@ -11,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
@@ -88,7 +87,7 @@ public class ServerStorageSoundHandlerMixin
     @Inject(method = "sendStopMessage", at = @At("HEAD"), remap = false)
     private static void OnSendStopMessage(ServerLevel serverWorld, Vec3 position, UUID storageUuid, CallbackInfo ci)
     {
-        EtchedStreamInfo info = EtchedStreamData.ACTIVE_STREAMS.remove(storageUuid);
+        EtchedStreamInfo info = EtchedData.ACTIVE_STREAMS_CACHE.remove(storageUuid);
         if (info != null)
         {
             System.out.println("[SBEI] OnSendStopMessage!");

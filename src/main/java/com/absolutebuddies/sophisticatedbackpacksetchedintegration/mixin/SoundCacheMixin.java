@@ -1,7 +1,6 @@
 package com.absolutebuddies.sophisticatedbackpacksetchedintegration.mixin;
 
-import gg.moonflower.etched.api.util.DownloadProgressListener;
-import gg.moonflower.etched.api.util.ProgressTrackingInputStream;
+import com.absolutebuddies.sophisticatedbackpacksetchedintegration.EtchedData;
 import gg.moonflower.etched.client.sound.SoundCache;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -15,53 +14,44 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.commons.io.FilenameUtils;
-
 @Mixin(value = SoundCache.class, remap = false)
-public class SoundCacheMixin {
+public class SoundCacheMixin
+{
+    @Inject(method = "updateCache", at = @At("RETURN"), remap = false)
+    private static void onCacheUpdate(Path path, String key, InputStream stream, SoundCache.CacheMetadata metadata, CallbackInfo ci)
+    {
 
-    @Inject(
-            method = "updateCache",
-            at = @At("RETURN"),
-            remap = false
-    )
-    private static void onCacheUpdate(Path path, String key, InputStream stream, SoundCache.CacheMetadata metadata, CallbackInfo ci) {
-
-        String ext = "." + FilenameUtils.getExtension(key);
-
-        System.out.println("[Etched Integration] !!!");
+        System.out.println("[SBEI] !!!");
         System.out.println("  Path: " + path);
         System.out.println("  String: " + key);
-        System.out.println("  ext: " + ext);
 
-        try {
-            // Проверяем что файл существует и не пустой
-            if (!Files.exists(path) || Files.size(path) == 0) {
-                System.out.println("[Etched Integration] 123");
+        try
+        {
+            if(!Files.exists(path) || Files.size(path) == 0)
+            {
+                System.out.println("[SBEI] File not found!");
                 return;
             }
 
             AudioFile audioFile = AudioFileIO.readMagic(path.toFile());
             AudioHeader header = audioFile.getAudioHeader();
 
-            long durationMs = header.getTrackLength() * 1000L;
-            String format = header.getFormat();
-            long bitrate = header.getBitRateAsNumber();
-            String sampleRate = header.getSampleRate();
+            double duration = header.getPreciseTrackLength();
+            Integer ticks = (int) Math.round(duration * 20);
 
-            System.out.println("[Etched Integration] Audio file cached:");
+            System.out.println("[SBEI] Audio file cached:");
             System.out.println("  File: " + path.getFileName());
-            System.out.println("  Format: " + format);
-            System.out.println("  Duration: " + durationMs);
-            System.out.println("  Bitrate: " + bitrate + " kbps");
-            System.out.println("  Sample Rate: " + sampleRate + " Hz");
+            System.out.println("  Format: " + header.getFormat());
+            System.out.println("  Duration: " + duration);
+            System.out.println("  Ticks: " + ticks);
+            System.out.println("  Bitrate: " + header.getBitRateAsNumber() + " kbps");
+            System.out.println("  Sample Rate: " + header.getSampleRate() + " Hz");
 
-            // Сохраняем куда-нибудь для дальнейшего использования
-            // например в статическую мапу или в metadata Etched (если есть доступ)
-
-        } catch (Exception e) {
-            System.out.println("[Etched Integration] Failed to read audio metadata: " + e.getMessage());
-            // Не крашим игру если не получилось прочитать
+            EtchedData.AUDIO_DURATION_CACHE.put(key, ticks);
+        }
+        catch (Exception e)
+        {
+            System.out.println("[SBEI] Failed to read audio metadata: " + e.getMessage());
         }
     }
 }
