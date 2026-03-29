@@ -1,6 +1,6 @@
 package com.absolutebuddies.sophisticatedbackpacksetchedintegration.mixin;
 
-import com.absolutebuddies.sophisticatedbackpacksetchedintegration.EtchedData;
+import com.absolutebuddies.sophisticatedbackpacksetchedintegration.SophisticatedBackpacksEtchedIntegrationDataBase;
 import com.absolutebuddies.sophisticatedbackpacksetchedintegration.EtchedStreamInfo;
 import gg.moonflower.etched.common.item.EtchedMusicDiscItem;
 import gg.moonflower.etched.common.network.EtchedMessages;
@@ -17,6 +17,7 @@ import net.p3pp3rf1y.sophisticatedcore.network.PacketHandler;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.PlayDiscMessage;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.ServerStorageSoundHandler;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,7 +30,7 @@ import static net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.ServerStorageSoun
 public class ServerStorageSoundHandlerMixin
 {
     @Inject(method = "startPlayingDisc(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;Lnet/minecraft/world/item/Item;Ljava/lang/Runnable;)V", at = @At("HEAD"), cancellable = true)
-    private static void onStartPlayingDiscBlock(ServerLevel serverLevel, BlockPos position, UUID storageUuid, Item item, Runnable onFinishedHandler, CallbackInfo ci)
+    private static void OnStartPlayingDiscBlock(ServerLevel serverLevel, BlockPos position, UUID storageUuid, Item item, Runnable onFinishedHandler, CallbackInfo ci)
     {
         if(!(item instanceof EtchedMusicDiscItem)) return;
 
@@ -38,13 +39,14 @@ public class ServerStorageSoundHandlerMixin
         Vec3 pos = Vec3.atCenterOf(position);
         PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), pos, 128, new PlayDiscMessage(storageUuid, Item.getId(item), position));
 
-        putSoundInfo(serverLevel, storageUuid, onFinishedHandler, pos, 0);
+        putSoundInfo(serverLevel, storageUuid, onFinishedHandler, pos, serverLevel.getGameTime() + (long) SophisticatedBackpacksEtchedIntegrationDataBase.DISC_DURATION);
+        System.out.println("[SBEI] Registered: " + SophisticatedBackpacksEtchedIntegrationDataBase.DISC_DURATION);
 
         ci.cancel();
     }
 
     @Inject(method = "startPlayingDisc(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;Ljava/util/UUID;ILnet/minecraft/world/item/Item;Ljava/lang/Runnable;)V", at = @At("HEAD"), cancellable = true)
-    private static void onStartPlayingDiscEntity(ServerLevel serverLevel, Vec3 position, UUID storageUuid, int entityId, Item item, Runnable onFinishedHandler, CallbackInfo ci)
+    private static void OnStartPlayingDiscEntity(ServerLevel serverLevel, Vec3 position, UUID storageUuid, int entityId, Item item, Runnable onFinishedHandler, CallbackInfo ci)
     {
         if(!(item instanceof EtchedMusicDiscItem)) return;
 
@@ -52,7 +54,8 @@ public class ServerStorageSoundHandlerMixin
 
         PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), position, 128, new PlayDiscMessage(storageUuid, Item.getId(item), entityId));
 
-        putSoundInfo(serverLevel, storageUuid, onFinishedHandler, position, serverLevel.getGameTime() + ...);
+        putSoundInfo(serverLevel, storageUuid, onFinishedHandler, position, serverLevel.getGameTime() + (long) SophisticatedBackpacksEtchedIntegrationDataBase.DISC_DURATION);
+        System.out.println("[SBEI] Registered: " + SophisticatedBackpacksEtchedIntegrationDataBase.DISC_DURATION);
 
         ci.cancel();
     }
@@ -60,7 +63,7 @@ public class ServerStorageSoundHandlerMixin
     @Inject(method = "sendStopMessage", at = @At("HEAD"), remap = false)
     private static void OnSendStopMessage(ServerLevel serverWorld, Vec3 position, UUID storageUuid, CallbackInfo ci)
     {
-        EtchedStreamInfo info = EtchedData.ACTIVE_STREAMS_CACHE.remove(storageUuid);
+        EtchedStreamInfo info = SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.remove(storageUuid);
         if (info != null)
         {
             System.out.println("[SBEI] OnSendStopMessage!");

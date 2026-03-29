@@ -33,7 +33,7 @@ public class TrackDataMixin
             MultimediaObject multimediaObject = new MultimediaObject(new URL(Url));
 
             long duration = multimediaObject.getInfo().getDuration();
-            int ticks = Math.round(duration * 50);
+            int ticks = Math.round(duration / 50);
 
             System.out.println("[SBEI] Duration: " + ticks + " ticks");
             return ticks;
@@ -43,6 +43,7 @@ public class TrackDataMixin
             e.printStackTrace();
         }
 
+        System.out.println("[SBEI] GetDurationTicks error!");
         return 200;
     }
 }
