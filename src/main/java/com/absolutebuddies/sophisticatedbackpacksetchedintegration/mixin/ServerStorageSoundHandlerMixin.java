@@ -107,7 +107,7 @@ public class ServerStorageSoundHandlerMixin
             else
             {
                 EtchedMessages.PLAY.send(
-                    PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(info.blockPos.getX() + 0.5, info.blockPos.getY() + 0.5, info.blockPos.getZ() + 0.5, 128.0, serverWorld.dimension())),
+                    PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(info.blockPos.getX(), info.blockPos.getY(), info.blockPos.getZ(), 64.0, serverWorld.dimension())),
                     new ClientboundPlayMusicPacket(ItemStack.EMPTY, info.blockPos)
                 );
             }

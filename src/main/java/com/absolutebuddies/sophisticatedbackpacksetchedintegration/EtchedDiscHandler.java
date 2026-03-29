@@ -41,7 +41,7 @@ public class EtchedDiscHandler implements IDiscHandler<EtchedMusicDiscItem>
         EtchedStreamData.ACTIVE_STREAMS.put(storageUuid, EtchedStreamInfo.forBlock(pos));
 
         EtchedMessages.PLAY.send(
-                PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 64.0, level.dimension())),
+                PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64.0, level.dimension())),
                 new ClientboundPlayMusicPacket(stack.copy(), pos)
         );
 
