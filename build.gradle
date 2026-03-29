@@ -20,6 +20,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
+    jarJar.enable()
 
     mixin {
         add sourceSets.main, "sophisticatedbackpacksetchedintegration.refmap.json"
@@ -95,17 +96,31 @@ dependencies {
     // minecraftLibrary 'net.jthink:jaudiotagger:3.0.1'
     // implementation 'net.jthink:jaudiotagger:3.0.1'
 
-    minecraftLibrary 'ws.schild:jave-all-deps:3.3.1'
-    implementation 'ws.schild:jave-all-deps:3.3.1'
+    implementation "ws.schild:jave-all-deps:3.3.1"
+    minecraftLibrary "ws.schild:jave-all-deps:3.3.1"
+    jarJar(group: 'ws.schild', name: 'jave-all-deps', version: '[3.3.1,)')
+
+    // minecraftLibrary 'ws.schild:jave-all-deps:3.3.1'
+    // implementation 'ws.schild:jave-all-deps:3.3.1'
 }
 
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
-            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version: forge_version, forge_version_range: forge_version_range,
+            minecraft_version: minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+
+            forge_version: forge_version,
+            forge_version_range: forge_version_range,
+
             loader_version_range: loader_version_range,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description,
+
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_license: mod_license,
+            mod_version: mod_version,
+            mod_authors: mod_authors,
+            mod_description: mod_description,
+            mod_logo_file: mod_logo_file
     ]
     inputs.properties replaceProperties
 
@@ -128,6 +143,11 @@ tasks.named('jar', Jar).configure {
     }
 
     finalizedBy 'reobfJar'
+    archiveClassifier = 'raw'
+}
+
+tasks.named('jarJar').configure {
+    archiveClassifier = ''
 }
 
 publishing {
