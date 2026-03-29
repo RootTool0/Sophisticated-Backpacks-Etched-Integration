@@ -92,8 +92,11 @@ dependencies {
     implementation fg.deobf("curse.maven:sophisticated-core-618298:7645911")
     implementation fg.deobf("curse.maven:sophisticated-backpacks-422301:7608120")
 
-    minecraftLibrary 'net.jthink:jaudiotagger:3.0.1'
-    implementation 'net.jthink:jaudiotagger:3.0.1'
+    // minecraftLibrary 'net.jthink:jaudiotagger:3.0.1'
+    // implementation 'net.jthink:jaudiotagger:3.0.1'
+
+    minecraftLibrary 'ws.schild:jave-all-deps:3.3.1'
+    implementation 'ws.schild:jave-all-deps:3.3.1'
 }
 
 tasks.named('processResources', ProcessResources).configure {

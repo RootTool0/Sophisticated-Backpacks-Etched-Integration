@@ -4,6 +4,8 @@ import gg.moonflower.etched.common.item.EtchedMusicDiscItem;
 import gg.moonflower.etched.common.network.EtchedMessages;
 import gg.moonflower.etched.common.network.play.ClientboundPlayEntityMusicPacket;
 import gg.moonflower.etched.common.network.play.ClientboundPlayMusicPacket;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -67,13 +69,15 @@ public class EtchedDiscHandler implements IDiscHandler<EtchedMusicDiscItem>
     @Override
     public Optional<Integer> getMusicLengthInTicks(ItemStack stack, Level level)
     {
-        String key = stack.getTag().getCompound("Music").getString("Url");
-        System.out.println("[SBEI] getMusicLengthInTicks Key:" + key);
+        CompoundTag tag = stack.getTag();
+        if(tag == null) { System.out.println("[SBEI] tag == null"); return Optional.empty(); }
+        if(!tag.contains("Music", Tag.TAG_COMPOUND)) { System.out.println("[SBEI] !contains Music"); return Optional.empty(); }
 
-        int ticks = EtchedData.AUDIO_DURATION_CACHE.getOrDefault(key, 1200);
-        System.out.println("[SBEI] getMusicLengthInTicks Ticks:" + ticks);
+        CompoundTag musicTag = tag.getCompound("Music");
+        if(!musicTag.contains("Duration", Tag.TAG_INT)) { System.out.println("[SBEI] !contains Duration"); return Optional.empty(); }
 
-        return Optional.of(ticks);
+        System.out.println("[SBEI] return Duration!");
+        return Optional.of(musicTag.getInt("Duration"));
     }
 
     @Override

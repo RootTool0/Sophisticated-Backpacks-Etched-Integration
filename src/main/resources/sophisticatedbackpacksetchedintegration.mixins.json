@@ -7,7 +7,7 @@
   ],
   "mixins": [
     "ServerStorageSoundHandlerMixin",
-    "SoundCacheMixin"
+    "TrackDataMixin"
   ],
   "injectors": {
     "defaultRequire": 1

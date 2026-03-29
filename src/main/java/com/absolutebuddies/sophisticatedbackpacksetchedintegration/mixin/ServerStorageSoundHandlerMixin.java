@@ -31,57 +31,30 @@ public class ServerStorageSoundHandlerMixin
     @Inject(method = "startPlayingDisc(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;Lnet/minecraft/world/item/Item;Ljava/lang/Runnable;)V", at = @At("HEAD"), cancellable = true)
     private static void onStartPlayingDiscBlock(ServerLevel serverLevel, BlockPos position, UUID storageUuid, Item item, Runnable onFinishedHandler, CallbackInfo ci)
     {
-        if (item instanceof EtchedMusicDiscItem)
-        {
-            System.out.println("[SBEI] onStartPlayingDiscBlock!");
+        if(!(item instanceof EtchedMusicDiscItem)) return;
 
-            Vec3 pos = Vec3.atCenterOf(position);
-            PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), pos, 128, new PlayDiscMessage(storageUuid, Item.getId(item), position));
-            long var10004 = serverLevel.getGameTime();
-            int var10005 = 1200; // TODO
+        System.out.println("[SBEI] onStartPlayingDiscBlock!");
 
-            putSoundInfo(serverLevel, storageUuid, onFinishedHandler, pos, var10004 + (long)var10005);
+        Vec3 pos = Vec3.atCenterOf(position);
+        PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), pos, 128, new PlayDiscMessage(storageUuid, Item.getId(item), position));
 
-            ci.cancel();
-        }
+        putSoundInfo(serverLevel, storageUuid, onFinishedHandler, pos, 0);
 
-        /*
-        if (item instanceof EtchedMusicDiscItem)
-        {
-            EtchedStreamData.ACTIVE_STREAMS.put(storageUuid, EtchedStreamInfo.forBlock(position));
-
-            EtchedMessages.PLAY.send(
-                    PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, 64.0, serverLevel.dimension())),
-                    new ClientboundPlayMusicPacket(item, position)
-            );
-        }
-        */
+        ci.cancel();
     }
 
     @Inject(method = "startPlayingDisc(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;Ljava/util/UUID;ILnet/minecraft/world/item/Item;Ljava/lang/Runnable;)V", at = @At("HEAD"), cancellable = true)
     private static void onStartPlayingDiscEntity(ServerLevel serverLevel, Vec3 position, UUID storageUuid, int entityId, Item item, Runnable onFinishedHandler, CallbackInfo ci)
     {
-        if (item instanceof EtchedMusicDiscItem)
-        {
-            System.out.println("[SBEI] onStartPlayingDiscEntity!");
+        if(!(item instanceof EtchedMusicDiscItem)) return;
 
-            PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), position, 128, new PlayDiscMessage(storageUuid, Item.getId(item), entityId));
-            long var10004 = serverLevel.getGameTime();
-            int var10005 = 1200; // TODO
+        System.out.println("[SBEI] onStartPlayingDiscEntity!");
 
-            putSoundInfo(serverLevel, storageUuid, onFinishedHandler, position, var10004 + (long)var10005);
+        PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), position, 128, new PlayDiscMessage(storageUuid, Item.getId(item), entityId));
 
-            ci.cancel();
-            // ci.cancel();
-        }
+        putSoundInfo(serverLevel, storageUuid, onFinishedHandler, position, serverLevel.getGameTime() + ...);
 
-        /*
-        if (item instanceof EtchedMusicDiscItem)
-        {
-            EtchedStreamData.ACTIVE_STREAMS.put(storageUuid, EtchedStreamInfo.forEntity(entityId));
-
-        }
-        */
+        ci.cancel();
     }
 
     @Inject(method = "sendStopMessage", at = @At("HEAD"), remap = false)
