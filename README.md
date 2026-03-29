@@ -1,1 +1,2 @@
-# Sophisticated-Backpacks-Etched-Integration
+# Sophisticated Backpacks Etched Integration
+Simple integration mod.
