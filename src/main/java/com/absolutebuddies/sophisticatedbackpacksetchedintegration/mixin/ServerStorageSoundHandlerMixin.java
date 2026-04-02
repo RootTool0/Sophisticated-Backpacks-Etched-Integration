@@ -22,6 +22,7 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.StopDiscPlaybackMessage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,13 +35,34 @@ import static net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.ServerStorageSoun
 @Mixin(value = ServerStorageSoundHandler.class, remap = false)
 public class ServerStorageSoundHandlerMixin
 {
-    @Shadow()
-    private static Map<ResourceKey<Level>, Map<UUID, Object>> worldStorageSoundInfos;
+    @Invoker("sendStopMessage")
+    public static void invokeSendStopMessage(ServerLevel serverWorld, Vec3 position, UUID storageUuid) {
+        throw new AssertionError();
+    }
 
     @Inject(method = "startPlayingDisc(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;Lnet/minecraft/world/item/Item;Ljava/lang/Runnable;)V", at = @At("HEAD"), cancellable = true)
     private static void OnStartPlayingDiscBlock(ServerLevel serverLevel, BlockPos position, UUID storageUuid, Item item, Runnable onFinishedHandler, CallbackInfo ci)
     {
-        if(!(item instanceof EtchedMusicDiscItem)) return;
+        SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType type = SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.get(storageUuid);
+        if(!(item instanceof EtchedMusicDiscItem))
+        {
+            // Vanilla
+            if(type == SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType.Etched)
+            {
+                EtchedStreamInfo info = SophisticatedBackpacksEtchedIntegrationDataBase.ETCHED_STREAMS_CACHE.get(storageUuid);
+                if(info != null) StopEtchedStream(serverLevel, info);
+            }
+
+            SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.put(storageUuid, SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType.Vanilla);
+            return;
+        }
+
+        // Etched
+        if(type == SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType.Vanilla)
+            PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), Vec3.atCenterOf(position), 128, new StopDiscPlaybackMessage(storageUuid));
+            // invokeSendStopMessage(serverLevel, Vec3.atCenterOf(position), storageUuid);
+            // ServerStorageSoundHandler.stopPlayingDisc(serverLevel, Vec3.atCenterOf(position), storageUuid);
+        SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.put(storageUuid, SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType.Etched);
 
         System.out.println("[SBEI] onStartPlayingDiscBlock!");
 
@@ -56,7 +78,26 @@ public class ServerStorageSoundHandlerMixin
     @Inject(method = "startPlayingDisc(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;Ljava/util/UUID;ILnet/minecraft/world/item/Item;Ljava/lang/Runnable;)V", at = @At("HEAD"), cancellable = true)
     private static void OnStartPlayingDiscEntity(ServerLevel serverLevel, Vec3 position, UUID storageUuid, int entityId, Item item, Runnable onFinishedHandler, CallbackInfo ci)
     {
-        if(!(item instanceof EtchedMusicDiscItem)) return;
+        SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType type = SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.get(storageUuid);
+        if(!(item instanceof EtchedMusicDiscItem))
+        {
+            // Vanilla
+            if(type == SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType.Etched)
+            {
+                EtchedStreamInfo info = SophisticatedBackpacksEtchedIntegrationDataBase.ETCHED_STREAMS_CACHE.get(storageUuid);
+                if(info != null) StopEtchedStream(serverLevel, info);
+            }
+
+            SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.put(storageUuid, SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType.Vanilla);
+            return;
+        }
+
+        // Etched
+        if(type == SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType.Vanilla)
+            PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), position, 128, new StopDiscPlaybackMessage(storageUuid));
+            // invokeSendStopMessage(serverLevel, position, storageUuid);
+            // ServerStorageSoundHandler.stopPlayingDisc(serverLevel, position, storageUuid);
+        SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.put(storageUuid, SophisticatedBackpacksEtchedIntegrationDataBase.EStreamType.Etched);
 
         System.out.println("[SBEI] onStartPlayingDiscEntity!");
 
@@ -71,36 +112,15 @@ public class ServerStorageSoundHandlerMixin
     @Inject(method = "sendStopMessage", at = @At("HEAD"), remap = false)
     private static void OnSendStopMessage(ServerLevel serverWorld, Vec3 position, UUID storageUuid, CallbackInfo ci)
     {
-        EtchedStreamInfo info = SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.remove(storageUuid);
+        SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.remove(storageUuid);
+
+        EtchedStreamInfo info = SophisticatedBackpacksEtchedIntegrationDataBase.ETCHED_STREAMS_CACHE.remove(storageUuid);
         if (info == null) return;
 
         System.out.println("[SBEI] OnSendStopMessage!");
         StopEtchedStream(serverWorld, info);
         ci.cancel();
     }
-
-/*
-
-    @Inject(method = "putSoundInfo", at = @At("HEAD"))
-    private static void OnPutSoundInfo(ServerLevel serverLevel, UUID storageUuid, Runnable onFinishedHandler, Vec3 pos, long finishTime, CallbackInfo ci)
-    {
-        EtchedStreamInfo info = SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.get(storageUuid);
-        if(info == null)
-        {
-            // Vanilla
-            // if(worldStorageSoundInfos.containsKey(storageUuid))
-            //     PacketHandler.INSTANCE.sendToAllNear(serverLevel.dimension(), pos, 128, new StopDiscPlaybackMessage(storageUuid));
-            return;
-        }
-
-        if(!info.bRun) { info.bRun = true; return; }
-        else
-        {
-            SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.remove(storageUuid);
-            StopEtchedStream(serverLevel, info);
-        }
-    }
-*/
 
     @Unique
     private static void StopEtchedStream(ServerLevel serverLevel, EtchedStreamInfo info)

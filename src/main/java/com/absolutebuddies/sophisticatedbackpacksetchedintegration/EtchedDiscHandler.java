@@ -4,8 +4,6 @@ import gg.moonflower.etched.common.item.EtchedMusicDiscItem;
 import gg.moonflower.etched.common.network.EtchedMessages;
 import gg.moonflower.etched.common.network.play.ClientboundPlayEntityMusicPacket;
 import gg.moonflower.etched.common.network.play.ClientboundPlayMusicPacket;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -28,12 +26,12 @@ public class EtchedDiscHandler implements IDiscHandler<EtchedMusicDiscItem>
     public void playDisc(ServerLevel level, BlockPos pos, UUID storageUuid, ItemStack stack, Runnable onFinished)
     {
         System.out.println("[SBEI] playDisc block!");
-        SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.put(storageUuid, EtchedStreamInfo.forBlock(pos));
+        SophisticatedBackpacksEtchedIntegrationDataBase.ETCHED_STREAMS_CACHE.put(storageUuid, EtchedStreamInfo.forBlock(pos));
         SophisticatedBackpacksEtchedIntegrationDataBase.DISC_DURATION = getLengthInTicks(stack);
 
-                EtchedMessages.PLAY.send(
-                PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64.0, level.dimension())),
-                new ClientboundPlayMusicPacket(stack.copy(), pos)
+        EtchedMessages.PLAY.send(
+            PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64.0, level.dimension())),
+            new ClientboundPlayMusicPacket(stack.copy(), pos)
         );
 
         ServerStorageSoundHandler.startPlayingDisc(level, pos, storageUuid, stack.getItem(), onFinished);
@@ -43,11 +41,11 @@ public class EtchedDiscHandler implements IDiscHandler<EtchedMusicDiscItem>
     public void playDisc(ServerLevel level, Vec3 pos, UUID storageUuid, ItemStack stack, int entityId, Runnable onFinished)
     {
         System.out.println("[SBEI] playDisc entity!");
-        SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.put(storageUuid, EtchedStreamInfo.forEntity(entityId));
+        SophisticatedBackpacksEtchedIntegrationDataBase.ETCHED_STREAMS_CACHE.put(storageUuid, EtchedStreamInfo.forEntity(entityId));
         SophisticatedBackpacksEtchedIntegrationDataBase.DISC_DURATION = getLengthInTicks(stack);
 
         Entity entity = level.getEntity(entityId);
-        if (entity != null) {
+        if(entity != null) {
             EtchedMessages.PLAY.send(
                     PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
                     new ClientboundPlayEntityMusicPacket(stack.copy(), entity, false)
@@ -58,23 +56,7 @@ public class EtchedDiscHandler implements IDiscHandler<EtchedMusicDiscItem>
     }
 
     @Override
-    public Optional<Integer> getMusicLengthInTicks(ItemStack stack, Level level)
-    {
-        /*
-        CompoundTag tag = stack.getTag();
-        if(tag == null) { System.out.println("[SBEI] tag == null"); return Optional.empty(); }
-        if(!tag.contains("Music", Tag.TAG_COMPOUND)) { System.out.println("[SBEI] !contains Music"); return Optional.empty(); }
-
-        CompoundTag musicTag = tag.getCompound("Music");
-        if(!musicTag.contains("Duration", Tag.TAG_INT)) { System.out.println("[SBEI] !contains Duration"); return Optional.empty(); }
-
-        System.out.println("[SBEI] return Duration!");
-        return Optional.of(musicTag.getInt("Duration"));
-        */
-        int length = getLengthInTicks(stack);
-        // System.out.println("[SBEI] getMusicLengthInTicks called, returning: " + length);
-        return Optional.of(length);
-    }
+    public Optional<Integer> getMusicLengthInTicks(ItemStack stack, Level level) { return Optional.of(getLengthInTicks(stack)); }
 
     @Override
     public boolean supports(ItemStack stack) { return stack.getItem() instanceof EtchedMusicDiscItem; }

@@ -7,8 +7,7 @@
   ],
   "mixins": [
     "ServerStorageSoundHandlerMixin",
-    "TrackDataMixin",
-    "JukeboxUpgradeWrapperMixin"
+    "TrackDataMixin"
   ],
   "injectors": {
     "defaultRequire": 1
