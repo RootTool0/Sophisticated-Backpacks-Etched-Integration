@@ -72,7 +72,7 @@ public class EtchedDiscHandler implements IDiscHandler<EtchedMusicDiscItem>
         return Optional.of(musicTag.getInt("Duration"));
         */
         int length = getLengthInTicks(stack);
-        System.out.println("[SBEI] getMusicLengthInTicks called, returning: " + length);
+        // System.out.println("[SBEI] getMusicLengthInTicks called, returning: " + length);
         return Optional.of(length);
     }
 

@@ -6,6 +6,7 @@ public class EtchedStreamInfo
 {
     public final int entityId;
     public final BlockPos blockPos;
+    public boolean bRun = false;
 
     private EtchedStreamInfo(int entityId, BlockPos blockPos) {
         this.entityId = entityId;
