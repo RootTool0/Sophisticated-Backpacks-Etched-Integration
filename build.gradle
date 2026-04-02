@@ -20,7 +20,6 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
-    jarJar.enable()
 
     mixin {
         add sourceSets.main, "sophisticatedbackpacksetchedintegration.refmap.json"
@@ -93,15 +92,8 @@ dependencies {
     implementation fg.deobf("curse.maven:sophisticated-core-618298:7645911")
     implementation fg.deobf("curse.maven:sophisticated-backpacks-422301:7608120")
 
-    // minecraftLibrary 'net.jthink:jaudiotagger:3.0.1'
-    // implementation 'net.jthink:jaudiotagger:3.0.1'
-
-    implementation "ws.schild:jave-all-deps:3.3.1"
-    minecraftLibrary "ws.schild:jave-all-deps:3.3.1"
-    jarJar(group: 'ws.schild', name: 'jave-all-deps', version: '[3.3.1,)')
-
-    // minecraftLibrary 'ws.schild:jave-all-deps:3.3.1'
-    // implementation 'ws.schild:jave-all-deps:3.3.1'
+    minecraftLibrary 'net.jthink:jaudiotagger:3.0.1'
+    shadow 'net.jthink:jaudiotagger:3.0.1'
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -143,11 +135,6 @@ tasks.named('jar', Jar).configure {
     }
 
     finalizedBy 'reobfJar'
-    archiveClassifier = 'raw'
-}
-
-tasks.named('jarJar').configure {
-    archiveClassifier = ''
 }
 
 publishing {
