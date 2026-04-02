@@ -23,6 +23,27 @@ logoFile="${mod_logo_file}"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+[[dependencies.${mod_id}]]
+    modId="etched"
+    mandatory=true
+    versionRange="[1.20.1-2.1.2,)"
+    ordering="AFTER"
+    side="BOTH"
 
+# Зависимость от Sophisticated Core
+[[dependencies.${mod_id}]]
+    modId="sophisticatedcore"
+    mandatory=true
+    versionRange="[0.6.64.717,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Зависимость от Sophisticated Backpacks
+[[dependencies.${mod_id}]]
+    modId="sophisticatedbackpacks"
+    mandatory=true
+    versionRange="[3.21.1.1118,)"
+    ordering="AFTER"
+    side="BOTH"
 
 MixinConfigs = "sophisticatedbackpacksetchedintegration.mixins.json"

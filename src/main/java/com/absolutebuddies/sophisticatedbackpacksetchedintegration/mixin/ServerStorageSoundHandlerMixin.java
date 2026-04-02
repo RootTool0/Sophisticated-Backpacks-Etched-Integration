@@ -35,11 +35,6 @@ import static net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.ServerStorageSoun
 @Mixin(value = ServerStorageSoundHandler.class, remap = false)
 public class ServerStorageSoundHandlerMixin
 {
-    @Invoker("sendStopMessage")
-    public static void invokeSendStopMessage(ServerLevel serverWorld, Vec3 position, UUID storageUuid) {
-        throw new AssertionError();
-    }
-
     @Inject(method = "startPlayingDisc(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Ljava/util/UUID;Lnet/minecraft/world/item/Item;Ljava/lang/Runnable;)V", at = @At("HEAD"), cancellable = true)
     private static void OnStartPlayingDiscBlock(ServerLevel serverLevel, BlockPos position, UUID storageUuid, Item item, Runnable onFinishedHandler, CallbackInfo ci)
     {
@@ -77,11 +72,13 @@ public class ServerStorageSoundHandlerMixin
         SophisticatedBackpacksEtchedIntegrationDataBase.ACTIVE_STREAMS_CACHE.remove(storageUuid);
 
         EtchedStreamInfo info = SophisticatedBackpacksEtchedIntegrationDataBase.ETCHED_STREAMS_CACHE.remove(storageUuid);
-        if (info == null) return;
+        if(info != null)
+        {
+            System.out.println("[SBEI] OnSendStopMessage!");
+            StopEtchedStream(serverWorld, info);
+        }
 
-        System.out.println("[SBEI] OnSendStopMessage!");
-        StopEtchedStream(serverWorld, info);
-        ci.cancel();
+        // ci.cancel();
     }
 
     @Unique
