@@ -6,16 +6,22 @@ import gg.moonflower.etched.common.network.play.ClientboundPlayEntityMusicPacket
 import gg.moonflower.etched.common.network.play.ClientboundPlayMusicPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.p3pp3rf1y.sophisticatedcore.api.IDiscHandler;
 import net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.ServerStorageSoundHandler;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 
 public class EtchedDiscHandler implements IDiscHandler<EtchedMusicDiscItem>
 {
@@ -62,7 +68,7 @@ public class EtchedDiscHandler implements IDiscHandler<EtchedMusicDiscItem>
     public boolean supports(ItemStack stack) { return stack.getItem() instanceof EtchedMusicDiscItem; }
 
     @Override
-    public Optional<ItemStack> getRandomDisc(RandomSource var1) {  return Optional.empty(); }
+    public Optional<ItemStack> getRandomDisc(RandomSource randomSource) { return Optional.of(new ItemStack(Items.MUSIC_DISC_13)); }
 
     @Override
     public int getMusicDiscSize() { return 1; }
