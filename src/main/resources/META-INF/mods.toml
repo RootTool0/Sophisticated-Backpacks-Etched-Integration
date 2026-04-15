@@ -30,7 +30,7 @@ logoFile="${mod_logo_file}"
     ordering="AFTER"
     side="BOTH"
 
-# Зависимость от Sophisticated Core
+# Sophisticated Core
 [[dependencies.${mod_id}]]
     modId="sophisticatedcore"
     mandatory=true
@@ -38,7 +38,7 @@ logoFile="${mod_logo_file}"
     ordering="AFTER"
     side="BOTH"
 
-# Зависимость от Sophisticated Backpacks
+# Sophisticated Backpacks
 [[dependencies.${mod_id}]]
     modId="sophisticatedbackpacks"
     mandatory=true

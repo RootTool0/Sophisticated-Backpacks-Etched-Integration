@@ -13,13 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.File;
 import java.net.URL;
-/*
 
-import ws.schild.jave.MultimediaObject;
-import ws.schild.jave.info.MultimediaInfo;
-*/
-
-import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 
 @Mixin(value = TrackData.class, remap = false)
