@@ -19,7 +19,13 @@ sourceSets.main.resources {
 }
 
 repositories {
-
+    maven {
+        url = "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    mavenCentral()
 }
 
 base {
@@ -65,6 +71,13 @@ configurations {
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
+
+    implementation 'net.jthink:jaudiotagger:3.0.1'
+    jarJar 'net.jthink:jaudiotagger:3.0.1'
+
+    implementation "curse.maven:sophisticated-backpacks-422301:7102675" // https://www.curseforge.com/minecraft/mc-mods/sophisticated-backpacks/files/7102675
+    implementation "curse.maven:sophisticated-core-618298:7757835" // https://www.curseforge.com/minecraft/mc-mods/sophisticated-core/files/7757835
+    implementation "curse.maven:etched-491890:7088631" // https://www.curseforge.com/minecraft/mc-mods/etched/files/7088631
 }
 
 tasks.withType(ProcessResources).configureEach {
